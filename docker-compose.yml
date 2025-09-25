@@ -85,7 +85,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile.app
+      dockerfile: Dockerfile
     image: pm-app:latest
     container_name: pm-app
     environment:
