@@ -1,6 +1,5 @@
 {
     "name": "processmaker/processmaker",
-    "version": "4.15.7-patch-a",
     "description": "BPM PHP Software",
     "keywords": [
         "php bpm processmaker"
