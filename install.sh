@@ -31,12 +31,28 @@ docker compose up -d app
 docker compose up -d db redis
 docker compose up -d horizon scheduler web
 
+
+apt install jq -y
+jq '.license="AGPL-3.0-or-later" |
+    .require["aws/aws-sdk-php"]="^3.337" |
+    .require["processmaker/docker-executor-node"]="^1.1" |
+    .require["processmaker/docker-executor-php"]="^1.4" |
+    .require["processmaker/nayra"]="^1.12" |
+    .require["processmaker/pmql"]="^1.13" |
+    .require["simplesoftwareio/simple-qrcode"]="^4.0"
+' /opt/processmaker/composer.json > /tmp/composer-fixed.json
+docker run --rm \
+  -v /opt/processmaker:/app \
+  -v /tmp/composer-fixed.json:/app/composer-fixed.json:ro \
+  -w /app \
+  -e COMPOSER=/app/composer-fixed.json \
+  composer:2 \
+  sh -lc 'composer validate --no-check-publish && COMPOSER_MEMORY_LIMIT=-1 composer update --no-dev --no-interaction'
+
 # 7) نصب Composer داخل app (اگر vendor نداری)
 docker exec -it pm-app sh -lc '
   git config --global --add safe.directory /var/www/html || true
-  export COMPOSER_MEMORY_LIMIT=-1
-  composer validate --no-check-publish || true
-  composer install --no-dev --optimize-autoloader --no-interaction
+
   php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear
   php artisan migrate --force || true
 '

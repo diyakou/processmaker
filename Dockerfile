@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
     gnupg curl ca-certificates apt-transport-https lsb-release \
  && rm -rf /var/lib/apt/lists/*
 
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+ && docker-php-ext-install -j"$(nproc)" gd zip pdo_mysql intl bcmath exif pcntl sockets
 # اکستنشن‌های PHP هسته
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
  && docker-php-ext-install -j"$(nproc)" gd zip pdo_mysql intl bcmath exif pcntl sockets
