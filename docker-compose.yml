@@ -4,7 +4,7 @@ x-app-env: &app_env
   APP_ENV: production
   APP_NAME: ProcessMaker
   APP_DEBUG: "false"
-  APP_KEY=base64:9nL9ukI8noJGcG9zyP9O0O36O9xwFzi8FQBdP5o3a8A=
+  APP_KEY: "base64:9nL9ukI8noJGcG9zyP9O0O36O9xwFzi8FQBdP5o3a8A="
 
   # آدرس‌های داخلی بین سرویس‌ها
   APP_URL: http://web:8080
