@@ -14,7 +14,7 @@
 
     # DB (داخل کانتینر)
     DB_DRIVER: mysql
-    DB_HOSTNAME: db
+    DB_HOSTNAME: pm-db
     DB_PORT: 3306
     DB_DATABASE: pm4
     DB_USERNAME: pmuser
@@ -22,7 +22,7 @@
 
     # DB داده‌ها (در صورت استفاده)
     DATA_DB_DRIVER: mysql
-    DATA_DB_HOST: db
+    DATA_DB_HOST: pm-db
     DATA_DB_PORT: 3306
     DATA_DB_DATABASE: pm4
     DATA_DB_USERNAME: pmuser
