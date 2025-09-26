@@ -6,9 +6,8 @@ curl -SL https://github.com/docker/compose/releases/download/v2.39.4/docker-comp
 chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
 apt update
 apt install docker.io -y
-grep -q '^APP_KEY=' .env 2>/dev/null || echo 'APP_KEY=base64:9nL9ukI8noJGcG9zyP9O0O36O9xwFzi8FQBdP5o3a8A=' >> .env
-grep -q '^COMPOSE_PROJECT_NAME=' .env 2>/dev/null || echo 'COMPOSE_PROJECT_NAME=processmaker' >> .env
-
+rm .env
+cp .env.example .env
 # 1) حذف docker-compose قدیمی و نصب Compose v2 (پلاگین رسمی)
 
 docker compose version   # باید چیزی شبیه v2.x نشان دهد

@@ -11,7 +11,9 @@ RUN apt-get update && apt-get install -y \
     libonig-dev libxml2-dev libicu-dev libpq-dev libssl-dev librdkafka-dev \
     gnupg curl ca-certificates apt-transport-https lsb-release \
  && rm -rf /var/lib/apt/lists/*
-
+RUN set -eux; \
+    pecl install redis \
+ && docker-php-ext-enable redis
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
  && docker-php-ext-install -j"$(nproc)" gd zip pdo_mysql intl bcmath exif pcntl sockets
 
