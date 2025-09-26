@@ -34,18 +34,49 @@ class MetricsService
      * @param mixed $adapter The storage adapter to use (e.g., Redis).
      */
     public function __construct(private $adapter = null)
-    {
-        $this->namespace = config('app.prometheus_namespace', 'app');
-        try {
-            // Set up Redis as the adapter if none is provided
-            if ($adapter === null) {
-                $adapter = Redis::fromExistingConnection(app('redis')->client());
+{
+    $this->namespace = config('app.prometheus_namespace', 'app');
+
+    try {
+        // اگر هیچ آداپتری پاس نداده باشیم
+        if ($adapter === null) {
+            // مطمئن شو اکستنشن phpredis نصب شده
+            if (!extension_loaded('redis')) {
+                throw new \RuntimeException(
+                    'phpredis extension is not loaded. Install ext-redis or disable metrics.'
+                );
             }
-            $this->collectionRegistry = new CollectorRegistry($adapter);
-        } catch (Exception $e) {
-            throw new RuntimeException('Error initializing the metrics adapter: ' . $e->getMessage());
+
+            // گرفتن مقادیر اتصال از env/config
+            $host = config('database.redis.default.host', env('REDIS_HOST', '127.0.0.1'));
+            $port = (int) config('database.redis.default.port', env('REDIS_PORT', 6379));
+            $pwd  = config('database.redis.default.password', env('REDIS_PASSWORD', null));
+            $db   = (int) config('database.redis.default.database', env('REDIS_DB', 0));
+
+            // ساخت یک شیء \Redis (phpredis)
+            $redis = new \Redis();
+            $redis->connect($host, $port, 1.5);
+
+            if (!empty($pwd)) {
+                $redis->auth($pwd);
+            }
+
+            if ($db > 0) {
+                $redis->select($db);
+            }
+
+            // آداپتر Prometheus با phpredis
+            $adapter = \Prometheus\Storage\Redis::fromExistingConnection($redis);
         }
+
+        $this->collectionRegistry = new \Prometheus\CollectorRegistry($adapter);
+    } catch (\Exception $e) {
+        throw new \RuntimeException(
+            'Error initializing the metrics adapter: ' . $e->getMessage()
+        );
     }
+}
+
 
     /**
      * Get the collection registry.
