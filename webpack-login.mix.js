@@ -1,6 +1,7 @@
 const mix = require("laravel-mix");
 const path = require("path");
 const fs = require("fs");
+mix.setPublicPath('public');
 
 const manifestPath = path.resolve(__dirname, "public/mix-manifest.json");
 let existingContent = {};

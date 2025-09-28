@@ -2,20 +2,18 @@
 FROM node:18-alpine AS frontend
 WORKDIR /app
 
-# ابزارهای لازم برای بیلد بعضی پکیج‌ها
 RUN apk add --no-cache bash git python3 make g++
 
-# فقط فایل‌های لازم برای نصب و بیلد را کپی کن (کش بهتر عمل کند)
 COPY package.json package-lock.json* yarn.lock* ./
 COPY webpack.mix.js webpack-login.mix.js ./
 COPY public ./public
-
 COPY resources ./resources
 
-# نصب (devDependencies هم نصب شود چون mix در dev است)
 RUN npm ci || npm install
 
-# اجرای بیلد (اگر یکی از فایل‌های mix را نداری، آن بخش را حذف کن)
+# ✅ مهم: مسیر مطلق /public را به /app/public نگاشت کن
+RUN ln -s /app/public /public
+
 RUN npx mix --production && npx mix --mix-config=webpack-login.mix.js --production
 
 # ---------- Stage 2: PHP app ----------
