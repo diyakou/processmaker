@@ -8,6 +8,8 @@ RUN apk add --no-cache bash git python3 make g++
 # فقط فایل‌های لازم برای نصب و بیلد را کپی کن (کش بهتر عمل کند)
 COPY package.json package-lock.json* yarn.lock* ./
 COPY webpack.mix.js webpack-login.mix.js ./
+COPY public ./public
+
 COPY resources ./resources
 
 # نصب (devDependencies هم نصب شود چون mix در dev است)
