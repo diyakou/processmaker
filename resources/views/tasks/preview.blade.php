@@ -122,7 +122,7 @@
 </body>
 <!-- Scripts -->
 @if(config('broadcasting.default') == 'redis')
-<script src="{{config('broadcasting.connections.redis.host')}}/socket.io/socket.io.js"></script>
+<script src="https://bpms.clickapps.ir/socket.io/socket.io.js"></script>
 @endif
 <script src="{{ mix('js/manifest.js') }}"></script>
 <script src="{{ mix('js/vue-vendor.js') }}"></script>
