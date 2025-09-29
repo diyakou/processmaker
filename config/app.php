@@ -9,7 +9,7 @@ return [
     'name' => env('APP_NAME', 'ProcessMaker'),
 
     // The url of our host, will usually be set during installation
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'https://bpms.clickapps.ir'),
 
     // The application key to be used for hashing secrets
     'key' => env('APP_KEY', 'base64:x80I9vQNxwllSuwBkTwfUa5qkgPTRdwqHCPSz7zHi1U='),
