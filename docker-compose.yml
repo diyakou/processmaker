@@ -49,7 +49,7 @@ x-app-env: &app_env
 
   # ---- سشن و کوکی ----
   SESSION_DRIVER: file
-  SESSION_DOMAIN: .clickapps.ir
+  SESSION_DOMAIN: bpms.clickapps.ir
   SESSION_SECURE_COOKIE: "true"
   SESSION_SAME_SITE: none
   SESSION_LIFETIME: 120
