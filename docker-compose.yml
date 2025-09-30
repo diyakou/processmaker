@@ -3,7 +3,7 @@
   x-app-env: &app_env
     APP_ENV: production
     APP_NAME: ProcessMaker
-    APP_DEBUG: "false"
+    APP_DEBUG: ""
     APP_KEY: "base64:9nL9ukI8noJGcG9zyP9O0O36O9xwFzi8FQBdP5o3a8A="
 
     # آدرس‌های داخلی بین سرویس‌ها
@@ -68,6 +68,10 @@
     PUSHER_CLUSTER:
     PUSHER_TLS: "false"
     PUSHER_DEBUG: "false"
+    SESSION_DRIVER: file        # یا redis
+    SESSION_DOMAIN: bpms.clickapps.ir
+    SESSION_SECURE_COOKIE: true # چون سایتت HTTPSـه
+    SESSION_SAME_SITE: Lax      # یا None اگر نیاز به cross-site داری
 
   services:
     web:
