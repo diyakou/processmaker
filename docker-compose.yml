@@ -3,24 +3,24 @@
   x-app-env: &app_env
     APP_ENV: production
     APP_NAME: ProcessMaker
-    APP_DEBUG: ""
-    APP_KEY: "base64:9nL9ukI8noJGcG9zyP9O0O36O9xwFzi8FQBdP5o3a8A="
+    APP_DEBUG: "true"
+    APP_KEY: "base64:XXLgKe/ZDRyZcEJU2SU4f7QPP/wcX5e8pdAqGOnsHhw="
 
-    # آدرس‌های داخلی بین سرویس‌ها
+    # ---- آدرس‌های داخلی بین سرویس‌ها ----
     APP_URL: https://bpms.clickapps.ir
     PM4_API_URL: https://bpms.clickapps.ir/api/1.0
     DOCKER_HOST_URL: https://bpms.clickapps.ir
     FORCE_HTTPS: "false"
+    APP_TRUSTED_HOSTS: https://bpms.clickapps.ir
 
-    # DB (داخل کانتینر)
+    # ---- پایگاه داده ----
     DB_DRIVER: mysql
-    DB_HOSTNAME: pm-db
+    DB_HOST: pm-db
     DB_PORT: 3306
     DB_DATABASE: pm4
     DB_USERNAME: pmuser
     DB_PASSWORD: StrongPassword!
 
-    # DB داده‌ها (در صورت استفاده)
     DATA_DB_DRIVER: mysql
     DATA_DB_HOST: pm-db
     DATA_DB_PORT: 3306
@@ -29,32 +29,48 @@
     DATA_DB_PASSWORD: StrongPassword!
     DATA_DB_ENGINE: InnoDB
 
-    # صف/ردیس
-    QUEUE_CONNECTION: redis
-    REDIS_CLIENT: predis
-    REDIS_PREFIX: ""
-    HORIZON_PREFIX: "horizon:"
+    # ---- Pusher / Socket.io ----
+    PUSHER_SCHEME: https
+    PUSHER_HOST: bpms.clickapps.ir
+    PUSHER_PORT: 6001
 
-    # اسکریپت رانرهای Docker
+    # ---- صف و کش ----
+    CACHE_STORE: array
+    QUEUE_CONNECTION: redis
+    REDIS_CLIENT: phpredis
+    REDIS_PORT: 6379
+    REDIS_HOST: pm-redis
+    REDIS_PASSWORD:
+    REDIS_PREFIX:
+    HORIZON_PREFIX: horizon:
+
+    # ---- سشن و کوکی ----
+    SESSION_DRIVER: file
+    SESSION_DOMAIN: bpms.clickapps.ir
+    SESSION_SECURE_COOKIE: "true"
+    SESSION_SAME_SITE: Lax
+
+    # ---- تنظیمات اسکریپت و داکر ----
     PROCESSMAKER_SCRIPTS_HOME: /var/www/html/storage/app
     PROCESSMAKER_SCRIPTS_DOCKER: /usr/bin/docker
     PROCESSMAKER_SCRIPTS_DOCKER_MODE: binding
-    # مهم: اکزکیوتورها به همین شبکهٔ compose وصل می‌شن
     PROCESSMAKER_SCRIPTS_DOCKER_PARAMS: "--network=${COMPOSE_PROJECT_NAME}_default"
     CUSTOM_EXECUTORS: "true"
 
-    # میکروسرویس رانر خاموش
+    # ---- اسکریپت مایکروسرویس (غیرفعال) ----
     SCRIPT_MICROSERVICE_ENABLED: "false"
 
-    # تنظیمات متفرقه
+    # ---- زمان و فرمت ----
     APP_TIMEZONE: UTC
     DATE_FORMAT: "m/d/Y H:i"
+
+    # ---- لاگ و پروکسی ----
     API_TIMEOUT: 5000
     PROXIES: "*"
     LOGOUT_OTHER_DEVICES: "false"
     BROWSER_CACHE: "true"
 
-    # Echo/WS (در صورت نیاز)
+    # ---- Echo Server (WebSocket) ----
     BROADCAST_DRIVER: redis
     BROADCASTER_HOST: https://bpms.clickapps.ir
     BROADCASTER_KEY: changeme
@@ -68,10 +84,11 @@
     PUSHER_CLUSTER:
     PUSHER_TLS: "false"
     PUSHER_DEBUG: "false"
-    SESSION_DRIVER: file        # یا redis
-    SESSION_DOMAIN: bpms.clickapps.ir
-    SESSION_SECURE_COOKIE: true # چون سایتت HTTPSـه
-    SESSION_SAME_SITE: Lax      # یا None اگر نیاز به cross-site داری
+
+    # ---- مسیرها ----
+    HOME: /var/www/html
+    TELESCOPE_ENABLED: "false"
+
 
   services:
     web:
