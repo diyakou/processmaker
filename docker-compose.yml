@@ -14,13 +14,15 @@ x-app-env: &app_env
   APP_TRUSTED_HOSTS: https://bpms.clickapps.ir
 
   # ---- پایگاه داده ----
+ # DB (داخل کانتینر)
   DB_DRIVER: mysql
-  DB_HOST: pm-db
+  DB_HOSTNAME: pm-db
   DB_PORT: 3306
   DB_DATABASE: pm4
   DB_USERNAME: pmuser
   DB_PASSWORD: StrongPassword!
 
+  # DB داده‌ها (در صورت استفاده)
   DATA_DB_DRIVER: mysql
   DATA_DB_HOST: pm-db
   DATA_DB_PORT: 3306
@@ -28,6 +30,7 @@ x-app-env: &app_env
   DATA_DB_USERNAME: pmuser
   DATA_DB_PASSWORD: StrongPassword!
   DATA_DB_ENGINE: InnoDB
+
 
   # ---- Pusher / Socket.io ----
   PUSHER_SCHEME: https
