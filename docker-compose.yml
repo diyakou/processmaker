@@ -46,7 +46,7 @@ x-app-env: &app_env
   REDIS_PASSWORD: ""
   REDIS_PREFIX: ""
   HORIZON_PREFIX: "horizon:"
-  SESSION_DRIVER : file
+  SESSION_DRIVER : database
 
 
   # ---- سشن و کوکی ----
