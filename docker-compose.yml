@@ -46,16 +46,20 @@ x-app-env: &app_env
   REDIS_PASSWORD: ""
   REDIS_PREFIX: ""
   HORIZON_PREFIX: "horizon:"
+  SESSION_DRIVER : file
+
 
   # ---- سشن و کوکی ----
-  SESSION_DRIVER: redis
-  SESSION_DOMAIN: bpms.clickapps.ir
-  SESSION_SECURE_COOKIE: "true"
-  SESSION_SAME_SITE: none
-  SESSION_LIFETIME: 120
+  # ---- سشن و کوکی ----
+  # ---- سشن و کوکی ----
+ # SESSION_DRIVER: redis
+ # SESSION_DOMAIN: bpms.clickapps.ir
+ # SESSION_SECURE_COOKIE: "true"
+  #SESSION_SAME_SITE: none
+  #SESSION_LIFETIME: 120
 
 
-  SANCTUM_STATEFUL_DOMAINS: bpms.clickapps.ir
+  #SANCTUM_STATEFUL_DOMAINS: bpms.clickapps.ir
 
 
   # ---- تنظیمات اسکریپت و داکر ----
