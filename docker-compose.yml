@@ -48,7 +48,7 @@ x-app-env: &app_env
   HORIZON_PREFIX: "horizon:"
 
   # ---- سشن و کوکی ----
-  SESSION_DRIVER: file
+  SESSION_DRIVER: redis
   SESSION_DOMAIN: bpms.clickapps.ir
   SESSION_SECURE_COOKIE: "true"
   SESSION_SAME_SITE: none
