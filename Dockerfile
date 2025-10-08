@@ -71,7 +71,14 @@ COPY --from=frontend /app/public/ /var/www/html/public/
 RUN composer install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader --no-scripts
 
 # دسترسی‌ها
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN mkdir -p /var/www/html/vendor && \
+    chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/vendor
+
+# نصب مجدد Composer و راه‌اندازی دیتابیس
+RUN composer install --no-dev --prefer-dist --optimize-autoloader && \
+    php artisan migrate --force && \
+    php artisan db:seed --force
+
 USER www-data
 
 # php-fpm به عنوان ENTRYPOINT پیش‌فرض ایمیج php:8.3-fpm
