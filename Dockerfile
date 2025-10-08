@@ -67,8 +67,8 @@ COPY . .
 COPY --from=frontend /app/public/ /var/www/html/public/
 
 # نصب Composer (Production)
-# اگر موقع build به .env نیاز داری، قبلش کپی کن؛ در غیر اینصورت --no-scripts را نگه دار
-RUN composer install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader
+# در مرحله build اسکریپت‌های composer را غیر فعال می‌کنیم تا artisan اجرا نشود
+RUN composer install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader --no-scripts
 
 # دسترسی‌ها
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
