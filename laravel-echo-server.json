@@ -1,32 +1,33 @@
 {
-  "authEndpoint": "/broadcasting/auth",
-  "clients": [
-    {
-      "appId": "0fd1f7a0ce0d527c",
-      "key": "21a795019957dde6bcd96142e05d4b10"
+    "authHost": "https://bpms.clickapps.ir",
+    "authEndpoint": "/broadcasting/auth",
+    "clients": [
+        {
+            "appId": "processmaker",
+            "key": "changeme"
+        }
+    ],
+    "database": "redis",
+    "databaseConfig": {
+        "redis": {
+            "host": "pm-redis",
+            "port": "6379",
+            "password": ""
+        }
+    },
+    "devMode": false,
+    "host": "0.0.0.0",
+    "port": 6001,
+    "protocol": "http",
+    "socketio": {},
+    "sslCertPath": "",
+    "sslKeyPath": "",
+    "sslCertChainPath": "",
+    "sslPassphrase": "",
+    "apiOriginAllow": {
+        "allowCors": true,
+        "allowOrigin": "https://bpms.clickapps.ir",
+        "allowMethods": "GET, POST",
+        "allowHeaders": "Origin, Content-Type, X-Auth-Token, X-Requested-With, Accept, Authorization, X-CSRF-TOKEN, X-Socket-Id"
     }
-  ],
-  "database": "redis",
-  "databaseConfig": {
-    "redis": {},
-    "sqlite": {
-      "databasePath": "/database/laravel-echo-server.sqlite"
-    }
-  },
-  "protocol": "http",
-  "socketio": {},
-  "sslCertPath": "",
-  "sslKeyPath": "",
-  "sslCertChainPath": "",
-  "sslPassphrase": "",
-  "subscribers": {
-    "http": true,
-    "redis": true
-  },
-  "apiOriginAllow": {
-    "allowCors": false,
-    "allowOrigin": "",
-    "allowMethods": "",
-    "allowHeaders": ""
-  }
 }

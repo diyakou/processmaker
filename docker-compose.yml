@@ -157,10 +157,12 @@ services:
     command: >
       sh -lc "
       apk add --no-cache bash git python3 make g++ || true &&
-      npx --yes laravel-echo-server@1.6.3 start --force
+      npm install -g laravel-echo-server@1.6.3 &&
+      laravel-echo-server start
       "
     volumes:
       - ./:/var/www/html
+      - ./laravel-echo-server.json:/var/www/html/laravel-echo-server.json:ro
     depends_on:
       - redis
       - app
