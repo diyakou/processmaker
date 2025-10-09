@@ -193,6 +193,18 @@ monacoLanguages.forEach((lang) => {
 });
 mix.copyDirectory(`${monacoSource}language`, `${monacoDestination}language`);
 
+// Create directories first
+const fs = require('fs');
+const path = require('path');
+
+// Ensure directories exist
+const dirs = ['public/css', 'public/css/admin'];
+dirs.forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
+
 mix
   .sass("resources/sass/sidebar/sidebar.scss", "public/css")
   .sass("resources/sass/collapseDetails.scss", "public/css")
