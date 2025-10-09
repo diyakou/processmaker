@@ -122,7 +122,7 @@ services:
     container_name: pm-app
     environment:
       <<: *app_env
-      APP_KEY: "${APP_KEY}"   # اگر در .env بیرونی داری
+      APP_KEY: base64:K9X3kTbDxVYz/ZM1Wl7G3k1on9PwVKuX5E4+/0vDF8Q=  # اگر در .env بیرونی داری
       COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME}"
     volumes:
       - ./:/var/www/html:rw
