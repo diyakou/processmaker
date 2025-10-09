@@ -4,7 +4,8 @@ x-app-env: &app_env
   APP_ENV: production
   APP_NAME: ProcessMaker
   APP_DEBUG: "true"
-  APP_KEY: "${APP_KEY}"
+  APP_KEY: base64:K9X3kTbDxVYz/ZM1Wl7G3k1on9PwVKuX5E4+/0vDF8Q=
+
 
   # ---- آدرس‌های داخلی بین سرویس‌ها ----
   APP_URL: https://bpms.clickapps.ir
