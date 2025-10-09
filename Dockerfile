@@ -9,44 +9,38 @@ COPY webpack.mix.js webpack-login.mix.js ./
 COPY public ./public
 COPY resources ./resources
 
+# اگر lock داری، سعی می‌کند ci برود؛ اگر نبود fallback به install
 RUN npm ci || npm install
 
-# ✅ مهم: مسیر مطلق /public را به /app/public نگاشت کن
-RUN ln -s /app/public /public
+# اگر واقعاً لازم داری، نگه دار؛ وگرنه حذف کن
+# RUN ln -s /app/public /public
 
 RUN npx mix --production && npx mix --mix-config=webpack-login.mix.js --production
 
 # ---------- Stage 2: PHP app ----------
 FROM php:8.3-fpm
 
-# زمان / locale
 ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# وابستگی‌های سیستمی
 RUN apt-get update && apt-get install -y \
     git unzip libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
     libonig-dev libxml2-dev libicu-dev libpq-dev libssl-dev librdkafka-dev \
     gnupg curl ca-certificates apt-transport-https lsb-release \
  && rm -rf /var/lib/apt/lists/*
 
-# اکستنشن‌های PHP (شامل phpredis)
+# PHP extensions + pecl
 RUN set -eux; \
     pecl install redis rdkafka; \
     docker-php-ext-enable redis rdkafka
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
  && docker-php-ext-install -j"$(nproc)" gd zip pdo_mysql intl bcmath exif pcntl sockets
 
-# composer
+# Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# (اختیاریِ قبلی) docker-cli داخل کانتینر — اگر لازم داری نگه دار؛ وگرنه حذفش کن
-# RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg \
-#  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list \
-#  && apt-get update && apt-get install -y docker-ce-cli \
-#  && rm -rf /var/lib/apt/lists/*
-
-# php.ini پایه
+# php.ini
 RUN { \
   echo "memory_limit=512M"; \
   echo "upload_max_filesize=20M"; \
@@ -54,31 +48,26 @@ RUN { \
   echo "max_execution_time=300"; \
 } > /usr/local/etc/php/conf.d/pm.ini
 
-# مسیر کاری
 WORKDIR /var/www/html
-
-# رفع "dubious ownership" برای git
 RUN git config --system --add safe.directory /var/www/html
 
-# کپی کل پروژه
+# کپی سورس (root مالک می‌ماند، بعداً chown می‌کنیم)
 COPY . .
 
-# کپی خروجی فرانت‌اند از استیج frontend
+# کپی خروجی فرانت‌اند
 COPY --from=frontend /app/public/ /var/www/html/public/
 
-# نصب Composer (Production)
-# در مرحله build اسکریپت‌های composer را غیر فعال می‌کنیم تا artisan اجرا نشود
+# نصب Composer فقط یک‌بار و بدون scripts تا artisan اجرا نشود
 RUN composer install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader --no-scripts
 
 # دسترسی‌ها
-RUN mkdir -p /var/www/html/vendor && \
-    chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/vendor
+RUN mkdir -p /var/www/html/vendor \
+ && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/vendor
 
-# نصب مجدد Composer و راه‌اندازی دیتابیس
-RUN composer install --no-dev --prefer-dist --optimize-autoloader && \
-    php artisan migrate --force && \
-    php artisan db:seed --force
+# Entrypoint در زمان run artisan‌ها را انجام می‌دهد
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 USER www-data
-
-# php-fpm به عنوان ENTRYPOINT پیش‌فرض ایمیج php:8.3-fpm
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["php-fpm"]
