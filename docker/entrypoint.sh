@@ -3,7 +3,13 @@ set -euo pipefail
 
 cd /var/www/html
 
-if [ ! -f .env ]; then
+# Backup existing .env if it exists and is small (incomplete)
+if [ -f .env ] && [ $(wc -c < .env) -lt 500 ]; then
+  mv .env .env.backup.$(date +%s)
+fi
+
+# Create complete .env if it doesn't exist or is incomplete
+if [ ! -f .env ] || [ $(wc -c < .env) -lt 500 ]; then
   cat > .env <<'EOF'
 APP_ENV=production
 APP_DEBUG=false
@@ -15,8 +21,8 @@ APP_KEY=
 LOG_CHANNEL=stack
 
 DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_PORT=3306
+DB_HOST=processmaker-mysql-1
+DB_PORT=33060
 DB_DATABASE=processmaker
 DB_USERNAME=processmaker
 DB_PASSWORD=secret
