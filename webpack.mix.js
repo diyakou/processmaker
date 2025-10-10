@@ -195,7 +195,6 @@ mix.copyDirectory(`${monacoSource}language`, `${monacoDestination}language`);
 
 // Create directories first
 const fs = require('fs');
-const path = require('path');
 
 // Ensure directories exist
 const dirs = ['public/css', 'public/css/admin'];
