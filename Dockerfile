@@ -1,3 +1,11 @@
+FROM node:18-alpine AS assets
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY resources ./resources
+COPY webpack.mix.js postcss.config.js babel.config.json tailwind.config.js ./
+RUN npm run prod || npm run build || true
+
 FROM php:8.1-fpm
 
 RUN apt-get update && apt-get install -y \
@@ -17,5 +25,10 @@ COPY . /var/www/html
 RUN composer install --no-dev --optimize-autoloader \
  && chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
+
+COPY --from=assets /app/public /var/www/html/public
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
 
