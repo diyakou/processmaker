@@ -12,12 +12,11 @@ fi
 if [ ! -f .env ] || [ $(wc -c < .env) -lt 500 ]; then
   cat > .env <<'EOF'
 APP_ENV=production
-APP_DEBUG=false
+APP_DEBUG=true
 APP_URL=https://bpms.clickapps.ir
 APP_TIMEZONE=UTC
 
-APP_KEY=
-
+  
 LOG_CHANNEL=stack
 
 DB_CONNECTION=mysql
