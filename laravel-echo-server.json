@@ -3,7 +3,10 @@
   "authEndpoint": "/broadcasting/auth",
   "database": "redis",
   "databaseConfig": {
-    "redis": {},
+    "redis": {
+      "host": "redis",
+      "port": "6379"
+    },
     "sqlite": {}
   },
   "devMode": false,
