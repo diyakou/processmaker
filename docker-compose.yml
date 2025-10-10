@@ -11,8 +11,8 @@ x-app-env: &app_env
   APP_URL: https://bpms.clickapps.ir
   PM4_API_URL: https://bpms.clickapps.ir/api/1.0
   DOCKER_HOST_URL: https://bpms.clickapps.ir
-  FORCE_HTTPS: "false"
-  APP_TRUSTED_HOSTS: https://bpms.clickapps.ir
+  FORCE_HTTPS: "true"
+  APP_TRUSTED_HOSTS: bpms.clickapps.ir
 
   # ---- پایگاه داده ----
  # DB (داخل کانتینر)
