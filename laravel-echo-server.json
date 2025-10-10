@@ -1,33 +1,19 @@
 {
-    "authHost": "https://bpms.clickapps.ir",
-    "authEndpoint": "/broadcasting/auth",
-    "clients": [
-        {
-            "appId": "processmaker",
-            "key": "changeme"
-        }
-    ],
-    "database": "redis",
-    "databaseConfig": {
-        "redis": {
-            "host": "pm-redis",
-            "port": "6379",
-            "password": ""
-        }
-    },
-    "devMode": false,
-    "host": "0.0.0.0",
-    "port": 6001,
-    "protocol": "http",
-    "socketio": {},
-    "sslCertPath": "",
-    "sslKeyPath": "",
-    "sslCertChainPath": "",
-    "sslPassphrase": "",
-    "apiOriginAllow": {
-        "allowCors": true,
-        "allowOrigin": "https://bpms.clickapps.ir",
-        "allowMethods": "GET, POST",
-        "allowHeaders": "Origin, Content-Type, X-Auth-Token, X-Requested-With, Accept, Authorization, X-CSRF-TOKEN, X-Socket-Id"
-    }
+  "authHost": "https://bpms.clickapps.ir",
+  "authEndpoint": "/broadcasting/auth",
+  "database": "redis",
+  "databaseConfig": {
+    "redis": {},
+    "sqlite": {}
+  },
+  "devMode": false,
+  "port": 6001,
+  "protocol": "http",
+  "referrers": [],
+  "socketio": {},
+  "sslCertPath": "",
+  "sslKeyPath": "",
+  "verifyAuthPath": true,
+  "verifyAuthServer": true
 }
+
