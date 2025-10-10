@@ -62,6 +62,8 @@ if ! grep -q "^APP_KEY=base64:" .env; then
   php artisan key:generate --force || true
 fi
 
+composer run-script post-autoload-dump || true
+php artisan package:discover || true
 php artisan config:clear || true
 php artisan optimize || true
 

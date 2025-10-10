@@ -23,7 +23,7 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 RUN git config --global --add safe.directory /var/www/html \
- && composer install --no-dev --optimize-autoloader \
+ && composer install --no-dev --optimize-autoloader --no-interaction --no-scripts \
  && chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 
