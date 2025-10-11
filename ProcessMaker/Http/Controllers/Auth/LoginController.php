@@ -17,7 +17,8 @@ use ProcessMaker\Models\Setting;
 use ProcessMaker\Models\User;
 use ProcessMaker\Package\Auth\Database\Seeds\AuthDefaultSeeder;
 use ProcessMaker\Traits\HasControllerAddons;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 class LoginController extends Controller
 {
     use HasControllerAddons;
@@ -191,46 +192,130 @@ class LoginController extends Controller
     }
 
     public function loginWithIntendedCheck(Request $request)
-    {
-        $intended = Cookie::get('processmaker_intended');
-        if ($intended) {
-            // Check if the route is a fallback, meaning it's invalid (like favicon.ico)
-            $route = app('router')->getRoutes()->match(
-                app('request')->create($intended)
-            );
-            if ($route->isFallback) {
+{
+    $t0 = microtime(true);
+    $rid = (string) \Illuminate\Support\Str::uuid(); // correlation id برای ردیابی این درخواست
+    $uname = (string) $request->input('username');
+
+    Log::info('Auth: loginWithIntendedCheck called', [
+        'rid' => $rid,
+        'ip' => $request->ip(),
+        'ua' => $request->userAgent(),
+        'username' => $uname,
+    ]);
+
+    // --- Intended redirect handling ---
+    $intended = \Cookie::get('processmaker_intended');
+    if ($intended) {
+        Log::debug('Auth: intended cookie found', ['rid' => $rid, 'intended' => $intended]);
+
+        try {
+            $route = app('router')->getRoutes()->match(app('request')->create($intended));
+            if (method_exists($route, 'isFallback') && $route->isFallback) {
+                Log::warning('Auth: intended route is fallback, ignoring', ['rid' => $rid, 'intended' => $intended]);
                 $intended = false;
             }
+        } catch (\Throwable $e) {
+            Log::warning('Auth: intended route match failed, ignoring', [
+                'rid' => $rid,
+                'intended' => $intended,
+                'error' => $e->getMessage(),
+            ]);
+            $intended = false;
+        }
 
-            // Getting intended deletes it, so put in back
+        if ($intended) {
+            // Getting intended deletes it, so put it back
             $request->session()->put('url.intended', $intended);
+            Log::debug('Auth: intended restored to session', ['rid' => $rid, 'intended' => $intended]);
         }
+    } else {
+        Log::debug('Auth: no intended cookie', ['rid' => $rid]);
+    }
 
-        // Check the status of the user
-        $user = User::where('username', $request->input('username'))->first();
-        if (!$user || $user->status === 'INACTIVE') {
-            $this->sendFailedLoginResponse($request);
-        } elseif ($user->status === 'BLOCKED') {
-            $this->throwLockedLoginResponse();
-        }
+    // --- User status checks ---
+    $user = \App\Models\User::where('username', $uname)->first();
+    if (!$user) {
+        Log::notice('Auth: user not found', ['rid' => $rid, 'username' => $uname]);
+        $this->sendFailedLoginResponse($request);
+        return; // sendFailedLoginResponse معمولا throw می‌کند؛ برای صراحت return گذاشتیم
+    }
 
+    Log::debug('Auth: user loaded', [
+        'rid' => $rid,
+        'user_id' => $user->id ?? null,
+        'status' => $user->status ?? null,
+    ]);
+
+    if (($user->status ?? null) === 'INACTIVE') {
+        Log::notice('Auth: inactive user blocked', ['rid' => $rid, 'user_id' => $user->id ?? null]);
+        $this->sendFailedLoginResponse($request);
+        return;
+    } elseif (($user->status ?? null) === 'BLOCKED') {
+        Log::warning('Auth: blocked user login attempt', ['rid' => $rid, 'user_id' => $user->id ?? null]);
+        $this->throwLockedLoginResponse();
+        return;
+    }
+
+    // --- Plugin addons ---
+    try {
         $addons = $this->getPluginAddons('command', []);
+        Log::debug('Auth: addons fetched', ['rid' => $rid, 'count' => is_countable($addons) ? count($addons) : 0]);
+
         foreach ($addons as $addon) {
-            if (array_key_exists('command', $addon)) {
-                $command = $addon['command'];
-                $command->execute($request, $request->input('username'));
+            if (array_key_exists('command', $addon) && isset($addon['command'])) {
+                $class = is_object($addon['command']) ? get_class($addon['command']) : gettype($addon['command']);
+                Log::debug('Auth: executing addon command', ['rid' => $rid, 'command' => $class]);
+                try {
+                    $command = $addon['command'];
+                    $command->execute($request, $uname);
+                } catch (\Throwable $e) {
+                    Log::error('Auth: addon command failed', [
+                        'rid' => $rid,
+                        'command' => $class,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
         }
+    } catch (\Throwable $e) {
+        Log::error('Auth: getPluginAddons failed', ['rid' => $rid, 'error' => $e->getMessage()]);
+    }
 
-        if (class_exists(\ProcessMaker\Package\Auth\Auth\LDAPLogin::class)) {
+    // --- Optional LDAP auth ---
+    if (class_exists(\ProcessMaker\Package\Auth\Auth\LDAPLogin::class)) {
+        Log::info('Auth: attempting LDAP auth', ['rid' => $rid, 'user_id' => $user->id ?? null]);
+        try {
+            // هرگز پسورد را لاگ نکن!
             $redirect = \ProcessMaker\Package\Auth\Auth\LDAPLogin::auth($user, $request->input('password'));
             if ($redirect !== false) {
+                Log::info('Auth: LDAP auth handled, redirecting', ['rid' => $rid]);
                 return $redirect;
             }
+            Log::debug('Auth: LDAP auth returned false, continue local login', ['rid' => $rid]);
+        } catch (\Throwable $e) {
+            Log::error('Auth: LDAP auth error', ['rid' => $rid, 'error' => $e->getMessage()]);
         }
-
-        return $this->login($request, $user);
+    } else {
+        Log::debug('Auth: LDAP class not present, skipping', ['rid' => $rid]);
     }
+
+    // --- Local login ---
+    Log::info('Auth: proceeding with local login()', [
+        'rid' => $rid,
+        'user_id' => $user->id ?? null,
+    ]);
+
+    $resp = $this->login($request, $user);
+
+    Log::info('Auth: login() finished', [
+        'rid' => $rid,
+        'ms' => (int) round((microtime(true) - $t0) * 1000),
+    ]);
+
+    return $resp;
+}
+
 
     /**
      * Get the login username to be used by the controller.

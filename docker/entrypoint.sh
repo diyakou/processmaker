@@ -11,14 +11,24 @@ fi
 # Create complete .env if it doesn't exist or is incomplete
 if [ ! -f .env ] || [ $(wc -c < .env) -lt 500 ]; then
   cat > .env <<'EOF'
+########################################
+#  --- App Core ---
+########################################
+APP_NAME="ProcessMaker"
 APP_ENV=production
 APP_DEBUG=true
+APP_KEY=base64:dvucW2IRG7cobfReZU3aVFP58Ma7t59g8WDFOZSK7gE=
 APP_URL=https://bpms.clickapps.ir
 APP_TIMEZONE=UTC
+DATE_FORMAT="m/d/Y H:i"
 
-  
 LOG_CHANNEL=stack
+FORCE_HTTPS=true
+TRUSTED_PROXIES=*
 
+########################################
+#  --- Database ---
+########################################
 DB_CONNECTION=processmaker
 DB_DRIVER=mysql
 DB_HOSTNAME=mysql
@@ -28,22 +38,67 @@ DB_USERNAME=processmaker
 DB_PASSWORD=secret
 DB_TIMEZONE=+00:00
 
+# Tenant/Landlord (در صورت استفاده)
+DATA_DB_DRIVER=mysql
+DATA_DB_HOST=mysql
+DATA_DB_PORT=3306
+DATA_DB_DATABASE=processmaker
+DATA_DB_USERNAME=processmaker
+DATA_DB_PASSWORD=secret
+BROADCAST_DRIVER=redis
+BROADCASTER_HOST=http://192.168.85.167:6001
+BROADCASTER_KEY=21a795019957dde6bcd96142e05d4b10
+########################################
+#  --- Redis / Queue / Cache / Session ---
+########################################
 CACHE_DRIVER=redis
-SESSION_DRIVER=redis
 QUEUE_CONNECTION=redis
+SESSION_DRIVER=file
 REDIS_CLIENT=predis
 REDIS_HOST=redis
 REDIS_PORT=6379
-BROADCAST_DRIVER=redis
+REDIS_PREFIX=
+HORIZON_PREFIX=horizon:
 
-
-
-TRUSTED_PROXIES=*
+SESSION_LIFETIME=120
+SESSION_SECURE_COOKIE=trued
 SESSION_DOMAIN=bpms.clickapps.ir
 SANCTUM_STATEFUL_DOMAINS=bpms.clickapps.ir
+SESSION_SAME_SITE=Lax
 
-FORCE_HTTPS=true
+########################################
+#  --- Broadcasting / WebSockets ---
+########################################
+BROADCAST_DRIVER=redis
 
+# اگر از Echo Server داکری استفاده می‌کنی:
+PUSHER_HOST=echo-server
+PUSHER_PORT=6001
+PUSHER_SCHEME=http
+PUSHER_TLS=false
+
+# گزینه‌های Pusher-style (در صورت نیاز)
+PUSHER_APP_ID=
+PUSHER_APP_KEY=
+PUSHER_APP_SECRET=
+PUSHER_CLUSTER=
+PUSHER_DEBUG=false
+
+# تنظیمات لاراول Echo
+LARAVEL_ECHO_SERVER_AUTH_HOST=https://bpms.clickapps.ir
+LARAVEL_ECHO_SERVER_PORT=6001
+LARAVEL_ECHO_SERVER_DEBUG=false
+
+########################################
+#  --- Frontend / Websocket Provider ---
+########################################
+VUE_APP_WEBSOCKET_PROVIDER=socket.io
+VUE_APP_WEBSOCKET_PROVIDER_URL=wss://bpms.clickapps.ir/socket.io/
+VUE_APP_COLLABORATIVE_ENABLED=true
+
+########################################
+#  --- ProcessMaker Internal ---
+########################################
 PROCESSMAKER_SCRIPTS_HOME=/var/www/html/storage/app
 PROCESSMAKER_SCRIPTS_DOCKER=/usr/bin/docker
 PROCESSMAKER_SCRIPTS_DOCKER_MODE=binding
@@ -51,18 +106,38 @@ PROCESSMAKER_SCRIPTS_DOCKER_HOST=
 PROCESSMAKER_SCRIPTS_DOCKER_PARAMS=
 PROCESSMAKER_SCRIPTS_TIMEOUT=timeout
 PROCESSMAKER_SYSTEM_SCRIPTS_TIMEOUT_SECONDS=300
+DOCKER_SHARED_MEMORY=256m
+CUSTOM_EXECUTORS=false
+
+########################################
+#  --- APIs / Integrations / AI ---
+########################################
+SAML_SP_DESTINATION="https://keycloak.processmaker.net/realms/realmname/broker/saml/endpoint"
+
+OPEN_AI_NLQ_TO_PMQL_ENABLED=true
+OPEN_AI_PROCESS_TRANSLATIONS_ENABLED=true
+OPEN_AI_SECRET=sk-xxxxxxxxxxxxxxxxxxxx
+AI_MICROSERVICE_HOST=http://localhost:8010
+AI_ENABLE_RAG_COLLECTIONS=false
+
+########################################
+#  --- Limits / Performance ---
+########################################
+PROCESS_REQUEST_ERRORS_RATE_LIMIT=1
+PROCESS_REQUEST_ERRORS_RATE_LIMIT_DURATION=86400
+CACHE_SETTING_DRIVER=cache_settings
+CACHE_SETTING_PREFIX=settings:
+
+########################################
+#  --- Miscellaneous ---
+########################################
+TELESCOPE_ENABLED=false
+BROWSER_CACHE=true
+LOGOUT_OTHER_DEVICES=false
+PROXIES=*
 
 L5_SWAGGER_GENERATE_ALWAYS=false
 
-# Realtime/Websockets via Redis + Echo (proxied through nginx)
-PUSHER_HOST=echo-server
-PUSHER_PORT=6001
-PUSHER_SCHEME=http
-PUSHER_TLS=false
-
-
-# Nayra / Message broker (optional)
-#MESSAGE_BROKER_DRIVER=default
 EOF
 fi
 
