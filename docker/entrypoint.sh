@@ -3,14 +3,19 @@ set -euo pipefail
 
 cd /var/www/html
 
-# Backup existing .env if it exists and is small (incomplete)
-if [ -f .env ] && [ $(wc -c < .env) -lt 500 ]; then
-  mv .env .env.backup.$(date +%s)
+size_of() {
+  # اگر فایل نیست، 0
+  [[ -f "$1" ]] && wc -c < "$1" || echo 0
+}
+
+# اگر .env هست و کوچیکه، بکاپ بگیر
+if [[ -f .env ]] && [[ "$(size_of .env)" -lt 500 ]]; then
+  mv .env ".env.backup.$(date +%s)"
 fi
 
-# Create complete .env if it doesn't exist or is incomplete
-if [ ! -f .env ] || [ $(wc -c < .env) -lt 500 ]; then
-  cat > .env <<'EOF'
+# اگر .env نیست یا ناقصه، بساز
+if [[ ! -f .env ]] || [[ "$(size_of .env)" -lt 500 ]]; then
+  cat <<'EOF' > .env
 ########################################
 #  --- App Core ---
 ########################################
@@ -28,9 +33,9 @@ TRUSTED_PROXIES=*
 ########################################
 #  --- Database ---
 ########################################
-DB_CONNECTION=processmaker
-DB_DRIVER=mysql
-DB_HOSTNAME=mysql
+# توجه: اگر لاراول/پروسسمیکر استفاده می‌کنی، معمولا این‌ها باید استاندارد باشند:
+DB_CONNECTION=mysql
+DB_HOST=mysql
 DB_PORT=3306
 DB_DATABASE=processmaker
 DB_USERNAME=processmaker
@@ -44,9 +49,7 @@ DATA_DB_PORT=3306
 DATA_DB_DATABASE=processmaker
 DATA_DB_USERNAME=processmaker
 DATA_DB_PASSWORD=secret
-BROADCAST_DRIVER=redis
-BROADCASTER_HOST=http://192.168.85.167:6001
-BROADCASTER_KEY=21a795019957dde6bcd96142e05d4b10
+
 ########################################
 #  --- Redis / Queue / Cache / Session ---
 ########################################
@@ -59,11 +62,12 @@ REDIS_PORT=6379
 REDIS_PREFIX=
 HORIZON_PREFIX=horizon:
 
-
 ########################################
 #  --- Broadcasting / WebSockets ---
 ########################################
 BROADCAST_DRIVER=redis
+BROADCASTER_HOST=http://echo-server:6001
+BROADCASTER_KEY=21a795019957dde6bcd96142e05d4b10
 
 # اگر از Echo Server داکری استفاده می‌کنی:
 PUSHER_HOST=echo-server
@@ -79,16 +83,9 @@ PUSHER_CLUSTER=
 PUSHER_DEBUG=false
 
 # تنظیمات لاراول Echo
-LARAVEL_ECHO_SERVER_AUTH_HOST=https://bpms.clickapps.ir
+LARAVEL_ECHO_SERVER_AUTH_HOST=http://nginx
 LARAVEL_ECHO_SERVER_PORT=6001
 LARAVEL_ECHO_SERVER_DEBUG=false
-
-########################################
-#  --- Frontend / Websocket Provider ---
-########################################
-VUE_APP_WEBSOCKET_PROVIDER=socket.io
-VUE_APP_WEBSOCKET_PROVIDER_URL=wss://bpms.clickapps.ir/socket.io/
-VUE_APP_COLLABORATIVE_ENABLED=true
 
 ########################################
 #  --- ProcessMaker Internal ---
@@ -102,13 +99,11 @@ PROCESSMAKER_SCRIPTS_TIMEOUT=timeout
 PROCESSMAKER_SYSTEM_SCRIPTS_TIMEOUT_SECONDS=300
 DOCKER_SHARED_MEMORY=256m
 CUSTOM_EXECUTORS=false
-
-
 EOF
 fi
 
-# Ensure key exists
-if ! grep -q "^APP_KEY=base64:" .env; then
+# اطمینان از داشتن APP_KEY
+if ! grep -q '^APP_KEY=base64:' .env; then
   php artisan key:generate --force || true
 fi
 
@@ -118,5 +113,3 @@ php artisan config:clear || true
 php artisan optimize || true
 
 exec php-fpm
-
-
