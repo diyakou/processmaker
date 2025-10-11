@@ -34,8 +34,8 @@ TRUSTED_PROXIES=*
 #  --- Database ---
 ########################################
 # توجه: اگر لاراول/پروسسمیکر استفاده می‌کنی، معمولا این‌ها باید استاندارد باشند:
-DB_CONNECTION=mysql
-DB_HOST=mysql
+DB_CONNECTION=processmaker
+DB_HOSTNAME=mysql
 DB_PORT=3306
 DB_DATABASE=processmaker
 DB_USERNAME=processmaker
