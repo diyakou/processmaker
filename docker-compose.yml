@@ -60,7 +60,7 @@ services:
     volumes:
       - ./:/var/www/html
     env_file: .env
-    entrypoint: ["sh","-lc","php artisan horizon"]
+    entrypoint: ["sh","-lc","php artisan horizon --verbose"]
     
     networks:
       - pm
