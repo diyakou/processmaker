@@ -1,15 +1,19 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  app:
+  web:
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
       - .env
-    entrypoint: ["/entrypoint.sh"]
+    # اگر در Dockerfile من از /usr/local/bin/init.sh استفاده کرده‌ایم:
+    entrypoint: ["/usr/local/bin/init.sh"]
+    ports:
+      - "8081:80"           # دسترسی اپ روی http://localhost:8081
+      - "6001:6001"         # (اختیاری) برای laravel-echo-server/broadcaster
     volumes:
-      - ./:/var/www/html
+      - ./:/var/www/html            # کد لوکال (حالت dev)
       - storage:/var/www/html/storage
       - vendor:/var/www/html/vendor
     depends_on:
@@ -18,84 +22,32 @@ services:
     networks:
       - pm
 
-  nginx:
-    image: nginx:1.25-alpine
-    depends_on:
-      - app
-    ports:
-      - "8081:80"
-    volumes:
-      - ./:/var/www/html:ro
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
     networks:
       - pm
 
   mysql:
-    image: mysql:8.0
+    image: mysql:5.7
+    restart: always
     environment:
+      MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: processmaker
-      MYSQL_USER: processmaker
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: root
-    command: --default-authentication-plugin=mysql_native_password
+      MYSQL_USER: pm
+      MYSQL_PASSWORD: pass
     ports:
-      - "33060:3306"
+      - "3306:3306"    # (اختیاری) اگر بیرون کانتینر هم می‌خوای وصل شی
     volumes:
-      - mysql:/var/lib/mysql
+      - database:/var/lib/mysql
     networks:
       - pm
 
-  redis:
-    image: redis:7-alpine
-    networks:
-      - pm
-
-  horizon:
-     image: processmaker-app
-     restart: unless-stopped
-     depends_on:
-       - redis
-       - mysql
-     working_dir: /var/www/html
-     command: php artisan horizon
-     env_file: .env
-     volumes:
-       - ./:/var/www/html
-     networks:
-       - pm
-
-
-
-
-  scheduler:
-    restart: unless-stopped
-    depends_on:
-      - app
-    image: composer:2
-    working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
-    entrypoint: ["sh","-lc","while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
-    networks:
-      - pm
-
-  echo-server:
-    image: node:18-alpine
-    working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
-    command: sh -lc "npx --yes laravel-echo-server start --force"
-    ports:
-      - "6001:6001"
-    networks:
-      - pm
+volumes:
+  database:
+  storage:
+  vendor:
 
 networks:
   pm:
-
-volumes:
-  storage:
-  vendor:
-  mysql:
-
-
+    driver: bridge
