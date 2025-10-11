@@ -59,9 +59,12 @@ services:
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
+    env_file: .env
     entrypoint: ["sh","-lc","php artisan horizon"]
+    
     networks:
       - pm
+
 
   scheduler:
     restart: unless-stopped
