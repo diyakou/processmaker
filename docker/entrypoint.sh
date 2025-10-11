@@ -17,7 +17,6 @@ if [ ! -f .env ] || [ $(wc -c < .env) -lt 500 ]; then
 APP_NAME="ProcessMaker"
 APP_ENV=production
 APP_DEBUG=true
-APP_KEY=base64:dvucW2IRG7cobfReZU3aVFP58Ma7t59g8WDFOZSK7gE=
 APP_URL=https://bpms.clickapps.ir
 APP_TIMEZONE=UTC
 DATE_FORMAT="m/d/Y H:i"
@@ -60,11 +59,6 @@ REDIS_PORT=6379
 REDIS_PREFIX=
 HORIZON_PREFIX=horizon:
 
-SESSION_LIFETIME=120
-SESSION_SECURE_COOKIE=trued
-SESSION_DOMAIN=bpms.clickapps.ir
-SANCTUM_STATEFUL_DOMAINS=bpms.clickapps.ir
-SESSION_SAME_SITE=Lax
 
 ########################################
 #  --- Broadcasting / WebSockets ---
@@ -109,36 +103,6 @@ PROCESSMAKER_SYSTEM_SCRIPTS_TIMEOUT_SECONDS=300
 DOCKER_SHARED_MEMORY=256m
 CUSTOM_EXECUTORS=false
 
-########################################
-#  --- APIs / Integrations / AI ---
-########################################
-SAML_SP_DESTINATION="https://keycloak.processmaker.net/realms/realmname/broker/saml/endpoint"
-
-OPEN_AI_NLQ_TO_PMQL_ENABLED=true
-OPEN_AI_PROCESS_TRANSLATIONS_ENABLED=true
-OPEN_AI_SECRET=sk-xxxxxxxxxxxxxxxxxxxx
-AI_MICROSERVICE_HOST=http://localhost:8010
-AI_ENABLE_RAG_COLLECTIONS=false
-
-########################################
-#  --- Limits / Performance ---
-########################################
-PROCESS_REQUEST_ERRORS_RATE_LIMIT=1
-PROCESS_REQUEST_ERRORS_RATE_LIMIT_DURATION=86400
-CACHE_SETTING_DRIVER=cache_settings
-CACHE_SETTING_PREFIX=settings:
-
-########################################
-#  --- Miscellaneous ---
-########################################
-TELESCOPE_ENABLED=false
-BROWSER_CACHE=true
-LOGOUT_OTHER_DEVICES=false
-PROXIES=*
-
-L5_SWAGGER_GENERATE_ALWAYS=false
-
-EOF
 fi
 
 # Ensure key exists
