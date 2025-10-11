@@ -20,7 +20,7 @@ APP_TIMEZONE=UTC
 LOG_CHANNEL=stack
 
 DB_CONNECTION=mysql
-DB_HOST=processmaker-mysql-1
+DB_HOST=mysql
 DB_PORT=3306
 DB_DATABASE=processmaker
 DB_USERNAME=processmaker
