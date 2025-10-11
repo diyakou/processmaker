@@ -5,17 +5,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        PM_VERSION: ${PM_VERSION:-4.14.0}
     env_file:
       - .env
-    # اگر در Dockerfile من از /usr/local/bin/init.sh استفاده کرده‌ایم:
-    entrypoint: ["/usr/local/bin/init.sh"]
     ports:
-      - "8081:80"           # دسترسی اپ روی http://localhost:8081
-      - "6001:6001"         # (اختیاری) برای laravel-echo-server/broadcaster
+      - "${PM_APP_PORT:-8081}:80"      # بیرون 8081 ← داخل 80
+      - "${PM_BROADCASTER_PORT:-6001}:6001"   # در صورت نیاز به Echo/Broadcaster
+    environment:
+      - PM_APP_URL=${PM_APP_URL:-https://bpms.clickapps.ir}
     volumes:
-      - ./:/var/www/html            # کد لوکال (حالت dev)
       - storage:/var/www/html/storage
-      - vendor:/var/www/html/vendor
+      # حالت توسعه: اگر می‌خواهی کد لوکال را هم Mount کنی (اختیاری)
+      # - ./:/var/www/html
     depends_on:
       - mysql
       - redis
@@ -37,7 +39,7 @@ services:
       MYSQL_USER: pm
       MYSQL_PASSWORD: pass
     ports:
-      - "3306:3306"    # (اختیاری) اگر بیرون کانتینر هم می‌خوای وصل شی
+      - "3306:3306"   # اختیاری؛ اگر بیرون هم نیاز داری
     volumes:
       - database:/var/lib/mysql
     networks:
@@ -46,7 +48,6 @@ services:
 volumes:
   database:
   storage:
-  vendor:
 
 networks:
   pm:
