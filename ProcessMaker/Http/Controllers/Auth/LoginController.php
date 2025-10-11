@@ -234,7 +234,7 @@ class LoginController extends Controller
     }
 
     // --- User status checks ---
-    $user = \App\Models\User::where('username', $uname)->first();
+    $user = \Models\User::where('username', $uname)->first();
     if (!$user) {
         Log::notice('Auth: user not found', ['rid' => $rid, 'username' => $uname]);
         $this->sendFailedLoginResponse($request);
