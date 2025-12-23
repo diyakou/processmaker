@@ -104,6 +104,10 @@ Route::middleware('auth', 'session_kill', 'sanitize', 'force_change_password', '
 
         Route::get('signals', [SignalController::class, 'index'])->name('signals.index')->middleware('can:view-signals');
         Route::get('signals/{signalId}/edit', [SignalController::class, 'edit'])->name('signals.edit')->middleware('can:edit-signals');
+
+        // Custom Data Sources Routes
+        Route::get('data-sources', [\App\Http\Controllers\DataSourceWebController::class, 'index'])->name('data-sources.index');
+        Route::get('data-sources/{dataSource}/edit', [\App\Http\Controllers\DataSourceWebController::class, 'edit'])->name('data-sources.edit');
     });
 
     Route::get('designer/processes/categories', [ProcessController::class, 'index'])->name('process-categories.index')->middleware('can:view-process-categories');

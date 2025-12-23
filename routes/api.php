@@ -400,6 +400,19 @@ Route::middleware('auth:api', 'setlocale', 'bindings', 'sanitize')->prefix('api/
     Route::post('encrypted_data/encryptText', [EncryptedDataController::class, 'encryptText'])->name('encrypted_data.encrypt_text');
     Route::post('encrypted_data/decryptText', [EncryptedDataController::class, 'decryptText'])->name('encrypted_data.decrypt_text');
 
+    // Custom Data Sources API
+    Route::prefix('data_sources')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\DataSourceController::class, 'index'])->name('data-sources.index');
+        Route::post('/', [\App\Http\Controllers\Api\DataSourceController::class, 'store'])->name('data-sources.store');
+        Route::get('/{dataSource}', [\App\Http\Controllers\Api\DataSourceController::class, 'show'])->name('data-sources.show');
+        Route::put('/{dataSource}', [\App\Http\Controllers\Api\DataSourceController::class, 'update'])->name('data-sources.update');
+        Route::delete('/{dataSource}', [\App\Http\Controllers\Api\DataSourceController::class, 'destroy'])->name('data-sources.destroy');
+        Route::post('/{dataSource}/test', [\App\Http\Controllers\Api\DataSourceController::class, 'test'])->name('data-sources.test');
+        Route::post('/{dataSource}/execute', [\App\Http\Controllers\Api\DataSourceController::class, 'execute'])->name('data-sources.execute');
+        Route::get('/{dataSource}/endpoints', [\App\Http\Controllers\Api\DataSourceController::class, 'endpoints'])->name('data-sources.endpoints');
+        Route::post('/from-swagger', [\App\Http\Controllers\Api\DataSourceController::class, 'createFromSwagger'])->name('data-sources.from-swagger');
+    });
+
     // DevLink
     Route::middleware('admin')->group(function () {
         Route::get('devlink', [DevLinkController::class, 'index'])->name('devlink.index');
